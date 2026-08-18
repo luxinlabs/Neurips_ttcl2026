@@ -20,6 +20,7 @@ class RetrievalReport:
     together so a single retrieval call yields all applicable diagnostics."""
 
     retrieved_ids: list[int]
+    retrieved_payloads: list[str]  # the actual memory text/notes, id-aligned
     staleness: int  # systematic channel: pending-write count at query time
     recall_at_k: float  # stochastic channel: approx vs. exact overlap
     retention_rate: float | None  # selection channel: vs. oracle, if tracked
@@ -44,14 +45,16 @@ class NoisyMemoryStore:
         self._budget = BudgetedMemory(selection or EvictionConfig())
         self._oracle = oracle  # unbounded-memory reference run, for retention_rate
         self._next_id = 0
+        self._payloads: dict[int, str] = {}
 
-    def write(self, vector: np.ndarray, importance: float = 0.0) -> int:
+    def write(self, vector: np.ndarray, payload: str = "", importance: float = 0.0) -> int:
         item_id = self._next_id
         self._next_id += 1
         vector = np.ascontiguousarray(vector, dtype=np.float32)
         self._approx.add(vector.reshape(1, -1), [item_id])
         self._shadow.write(vector, item_id)
         self._budget.add(item_id, vector, importance=importance)
+        self._payloads[item_id] = payload
         return item_id
 
     def retrieve(self, query: np.ndarray, k: int) -> RetrievalReport:
@@ -69,6 +72,7 @@ class NoisyMemoryStore:
 
         return RetrievalReport(
             retrieved_ids=retrieved_ids,
+            retrieved_payloads=[self._payloads.get(i, "") for i in retrieved_ids],
             staleness=self._shadow.staleness_at_query(),
             recall_at_k=self._approx.recall_at_k(query, k),
             retention_rate=retention,

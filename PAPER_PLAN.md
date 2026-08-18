@@ -133,8 +133,27 @@ mixed-effects model, task instance as random effect; primary reported quantity i
 stochastic×systematic **interaction term** with CI, not a bare significance threshold.
 N=15-20 instances/cell (no pilot data available; effect-size/CI framing chosen over
 power-justified N given the deadline). ≈324 grid rollouts + ~70-100 Selection rollouts ≈ 400
-total. Base-model choice (open-weight, Lambda-hosted) flagged as gating both compute
-feasibility and the harness build — **open question, not yet locked**.
+total.
+
+## [INSIGHT: base_model_and_stack]
+
+**Base agent model**: Llama-3.1-8B-Instruct (primary), Qwen3-4B (optional cheap secondary/
+robustness check) — both already validated by AgentOdyssey's own paper (Qwen3-4B smallest
+open model tested, Llama-3.1-8B used for their MemoryLLM/MPlus baselines), so neither choice
+is arbitrary. One consistent model across both testbeds (methodologically cleaner: one fewer
+confound between testbeds). Evo-Memory's own paper tested only closed API models
+(Gemini-2.5, Claude 3.5/3.7) — no open-weight precedent there, so our numbers on that testbed
+won't be directly comparable to their published baselines; note as an acknowledged limitation,
+not a blocker, since Evo-Memory's harness is used as a second matched-replay stage for our own
+ablation, not a leaderboard to beat. Fixed-size-memory design (already locked) is required
+regardless, per AgentOdyssey's own finding that Long-Context agents scale quadratically in
+token cost over long horizons while fixed-size-memory/RAG agents stay linear.
+
+**Inference stack**: vLLM (standard, well-supported for Llama-3.1-8B and Qwen3-4B; AWQ-INT4
+quantization available if GPU budget on Lambda credits gets tight).
+
+**Embedding model**: BAAI/bge-base-en-v1.5 (open-weight, 768-dim, fast — standard pairing
+with Llama-family generators for RAG/agent-memory setups).
 
 ---
 
