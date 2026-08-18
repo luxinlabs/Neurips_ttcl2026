@@ -1,0 +1,49 @@
+# Default experimental grid, per PAPER_PLAN.md [INSIGHT: ablation_design] and
+# [INSIGHT: sample_size_and_analysis].
+#
+# 3 stochastic levels x 3 systematic levels = 9-cell factorial (headline claim).
+# Selection stays one-at-a-time against the (exact, fresh) baseline (secondary/appendix).
+
+baseline:
+  stochastic: exact
+  systematic: fresh
+
+stochastic_levels:
+  exact:
+    kind: flat
+  moderate:
+    kind: hnsw
+    hnsw_m: 32
+    ef_search: 16
+    ef_construction: 40
+  aggressive:
+    kind: hnsw
+    hnsw_m: 8
+    ef_search: 4
+    ef_construction: 16
+
+systematic_levels:
+  fresh:
+    rebuild_cadence: 1
+  moderate:
+    rebuild_cadence: 10
+  stale:
+    rebuild_cadence: 50
+
+selection_conditions:
+  unbounded_oracle:
+    budget: null
+    policy: fifo
+  fifo_tight:
+    budget: 50
+    policy: fifo
+  lru_tight:
+    budget: 50
+    policy: lru
+  importance_tight:
+    budget: 50
+    policy: importance
+
+# Sample size: N=15-20 task instances per cell (no pilot data; effect-size/CI
+# framing over power-justified N, per [INSIGHT: sample_size_and_analysis]).
+n_instances_per_cell: 18
