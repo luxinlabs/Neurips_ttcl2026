@@ -157,6 +157,82 @@ with Llama-family generators for RAG/agent-memory setups).
 
 ---
 
+## [INSIGHT: headline_figure]
+
+Two-panel figure. **Panel A (primary)**: marginal-effects plot — two lines with CI ribbons
+showing drift vs. each channel independently at the other's baseline (stochastic level with
+systematic held at baseline; systematic level with stochastic held at baseline). This is the
+direct visual of "opposite-signed" — one line rising, one flat/falling — and the figure meant
+to be screenshotted into a talk. **Panel B (supporting)**: the 3×3 heatmap with the
+stochastic×systematic interaction term's estimate/CI annotated directly on it, doing the
+robustness/confound job. Both testbeds shown as small multiples (side-by-side columns), not
+pooled or overlaid in the figure itself — the figure shouldn't pre-commit to pooling before
+the mixed-effects analysis decides whether testbed is pooled or modeled separately.
+
+## [INSIGHT: falsification_criteria]
+
+- **Null interaction term (CI includes zero) is NOT a falsification** — it means the two
+  channels act additively/independently, which is the best-case robustness result: it answers
+  the Introduction's confound-robustness question (effects don't depend on each other's
+  setting) without touching the opposite-signed claim at all.
+- **Same-signed main effects falsifies the headline claim specifically.** Each channel could
+  still be real and mechanistically distinct, but "opposite-signed" is the citable hook and
+  the taxonomy-naming rationale — losing it makes this a different, less citable paper, not a
+  narrower-scope version of this one.
+- **No detectable main effect from either channel falsifies the foundational premise**, not
+  just contribution #1 — this contradicts the drift phenomenon borrowed from SkillLearnBench
+  itself. The one result that triggers a full stop-and-rethink rather than a reframe.
+
+## [INSIGHT: fallback_framing]
+
+If only one channel (most likely systematic) shows a real effect: reframe contribution #1 from
+"opposite-signed" to **"the taxonomy correctly predicts which noise type is consequential and
+which isn't"** — a sharper, more actionable practitioner claim (tells them where to spend
+engineering effort: index freshness over search accuracy, say) than drama for its own sake.
+The working title never committed to "opposite-signed," so it survives this fallback
+unchanged. The model-collapse analogy also survives/strengthens under this fallback, since
+compounding error is specifically a systematic-noise signature — if systematic is the one
+channel that's real, that's the cleanest possible confirmation the analogy pointed at the
+right mechanism.
+
+## [INSIGHT: conclusion_and_future_work]
+
+One-paragraph conclusion: Retrieval infrastructure has been treated as a neutral storage
+layer; this paper shows it's at least two mechanistically distinct noise channels with
+different — possibly opposite — consequences for whether a self-improving agent's behavior
+drifts. The practical payoff, regardless of which fallback scenario obtains, is
+decision-relevant: practitioners get told *which* infra knob to spend engineering effort on,
+not just "retrieval quality matters." The taxonomy, the matched-replay causal method, and the
+released harness are offered as reusable infrastructure for a question the field has so far
+only gestured at as future work.
+
+Future directions: (1) extending the taxonomy to noise channels not covered here (e.g.
+distributed/networked consolidation delay, not captured by either testbed); (2) adaptive infra
+policies that respond to detected drift in real time; (3) formalizing the model-collapse
+analogy into a derived theory — deliberately not attempted here (per the Lit Review's refusal
+to force the bias/variance equivalence), but motivated properly by the results, especially
+under the one-channel-real fallback.
+
+## [INSIGHT: limitations]
+
+Selection channel's retention-rate metric is novel, not adopted (flagged, kept secondary).
+Evo-Memory testbed has no open-weight precedent, so results there aren't directly comparable
+to its published closed-model baselines. N=15-20/cell uses effect-size/CI framing, not
+power-justified (no pilot data). Model-collapse analogy is motivating narrative, not formal
+derivation (Shumailov critique arXiv 2410.12954 addressed inline in Lit Review). Single base
+model (Llama-3.1-8B-Instruct) — generalization across model scale untested.
+**Compute-budget confound**: approximate search (aggressive HNSW) is faster than exact flat
+search; under any wall-clock or step budget, "more approximate" conditions could complete more
+steps than "more exact" conditions, confounding retrieval noise with effective compute/
+exploration budget. Mitigation (locked as a design requirement, not just a caveat): fix a
+per-episode STEP count, not wall-clock time, across every grid condition.
+
+---
+
+**Plan mode status: COMPLETE.** All six chapters (Introduction, Literature Review, Method,
+Results, Discussion, Conclusion) have locked INSIGHT entries above. Proceeding to `full` mode
+for drafting.
+
 ## Verified citations (see conversation log for full verification detail)
 
 | Key | ArXiv / Venue | Role |
