@@ -1,0 +1,14 @@
+# Conda environment — used in preference to pip for faiss, since faiss-cpu has no
+# prebuilt wheel for recent Python on this platform (pip install fails without `swig`
+# installed). Verified working in this repo's development: python=3.11, numpy=1.26,
+# faiss 1.12.0 from the pytorch channel.
+name: ttcl
+channels:
+  - pytorch
+  - conda-forge
+dependencies:
+  - python=3.11
+  - numpy=1.26
+  - pyyaml
+  - pytest
+  - faiss-cpu
