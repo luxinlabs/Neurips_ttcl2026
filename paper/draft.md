@@ -11,6 +11,18 @@
 
 Agents that improve themselves at test time by writing their own experience into memory and retrieving it on later steps sometimes get better and sometimes drift: recent work has shown that self-generated feedback alone can induce recursive degradation even when the same feedback mechanism improves agents under external supervision. We argue that part of this inconsistency is not algorithmic but architectural. The retrieval infrastructure that stores and serves an agent's memory is usually treated as a neutral component, but it introduces noise of at least two mechanistically distinct kinds: *stochastic* noise from approximate nearest-neighbor search, and *systematic* noise from index staleness, where a write is not yet visible to the queries that follow it. We give both a formal, checkable definition, add a third, secondary channel (*selection* noise from memory eviction under a fixed budget), and hypothesize that stochastic and systematic noise can pull self-feedback drift in opposite directions: the former behaving like a regularizer, the latter compounding error by letting an agent confidently reinforce a fact it has already superseded. We describe a matched-replay ablation that holds the starting task instance fixed across every infrastructure condition, isolating infrastructure as the only source of behavioral divergence, and specify the analysis, sample size, and falsification criteria before any run is executed. We release `driftbench`, a diagnostic harness implementing all three noise channels over FAISS, tested independently of the agent loop it will eventually drive. We present this as a position paper: the contribution is the taxonomy, the causal method with its pre-registered analysis plan, and the released harness, not a completed empirical result. Real testbed integration is in progress, and we take the position that specifying what would confirm or falsify the central claim in advance is itself a contribution the field's self-improvement literature has so far lacked, independent of which outcome the eventual experiment produces.
 
+**Keywords:** retrieval-augmented generation, agent memory, test-time continual learning, self-improvement, approximate nearest neighbor search, index staleness, catastrophic drift
+
+---
+
+## 摘要 (Abstract, Traditional Chinese)
+
+*Independently composed per ARS bilingual-abstract protocol, not a mechanical translation of the English abstract above; structurally aligned to cover the same points in the same order. This is a supplementary ARS deliverable, not a requirement of the NeurIPS submission itself — omitted from `paper.tex`.*
+
+能在測試階段藉自我產生回饋改進自身的代理人,有時進步、有時偏移:近期研究顯示,外部回饋能穩定改善其表現,但單靠自我回饋卻可能導致遞迴式性能退化。本文主張此一不一致性並非全然源自演算法,部分原因在於系統架構。儲存並提供代理人記憶的檢索基礎設施常被視為中立元件,實則至少引入兩種機制迥異的雜訊:近似最近鄰搜尋帶來的「隨機性」雜訊,與索引過時(寫入尚未對後續查詢可見)帶來的「系統性」雜訊。我們為兩者給出形式化、可檢驗的定義,並加入次要的第三管道,即固定預算下記憶體淘汰造成的「選擇性」雜訊,並假設隨機性與系統性雜訊可能使偏移朝相反方向發展:前者近似正則化效果,後者則因代理人自信強化已被取代的事實而使誤差複合累積。我們提出配對重播消融實驗,固定起始任務實例,隔離基礎設施為行為分歧的唯一來源,並在實驗執行前預先訂定分析方法、樣本數與證偽準則。我們釋出driftbench,一套以FAISS實作三種雜訊管道的診斷工具,獨立於代理人迴圈完成測試。本文以立場文章形式呈現:貢獻在於分類法、附帶預先登記分析計畫的因果方法,以及已釋出的工具,而非已完成的實證結果;真實測試平台整合仍在進行中。
+
+**關鍵詞:** 檢索增強生成、代理人記憶、測試時持續學習、自我改進、近似最近鄰搜尋、索引過時、災難性偏移
+
 ---
 
 ## 1. Introduction
@@ -125,9 +137,11 @@ The author declares no conflicts of interest.
 
 This work received no external funding. Computational resources for the planned experiments are expected to draw on GPU credits provided through the NeurIPS 2026 TTCL workshop's compute sponsorship (Lambda); no funds were received in connection with the preparation of this manuscript.
 
-## AI Usage Disclosure
+## Use of AI Tools
 
-*[To be finalized via the venue-specific disclosure-generation step; not yet run for this draft.]*
+The author used Claude Sonnet 5 (Anthropic) throughout the preparation of this manuscript. Specifically, the tool was used for literature search and citation verification (author lists, venues, and arXiv identifiers were fetched directly from source pages rather than relied upon from model memory), drafting of the manuscript text following a human-directed Socratic planning process in which the author made all substantive research and framing decisions, implementation and unit testing of the accompanying `driftbench` code harness, an internal simulated peer-review pass used to identify and address weaknesses prior to submission, and conversion of the manuscript to NeurIPS-format LaTeX. The AI assistant did not perform any data analysis: no experimental results exist at the time of this submission, per the Limitations section above. All AI-assisted output was reviewed and verified by the author, who takes full responsibility for the content of this manuscript.
+
+*Placement note: per NeurIPS's AI-usage policy (accessed 2026-04-09, `neurips.cc/public/EthicsGuidelines`), this disclosure belongs in the Acknowledgements section or a dedicated "Use of AI Tools" subsection before References — placed here as the latter. The policy snapshot is over four months old at the time of this draft; verify against the current NeurIPS page before final submission.*
 
 ---
 
