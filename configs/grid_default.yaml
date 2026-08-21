@@ -47,3 +47,17 @@ selection_conditions:
 # Sample size: N=15-20 task instances per cell (no pilot data; effect-size/CI
 # framing over power-justified N, per [INSIGHT: sample_size_and_analysis]).
 n_instances_per_cell: 18
+
+# Replicates per (instance, condition) cell, passed to
+# driftbench.replay.matched_replay.run_matched_replay(n_samples_per_cell=...).
+# With n_samples_per_cell=1 (the prior default), sampling variance from the
+# generation model's own stochastic decoding and between-instance
+# heterogeneity are NOT separately identifiable in the mixed-effects model --
+# there is only one observation per cell to estimate both from. Set to 2, the
+# minimum that restores identifiability (more replicates would sharpen the
+# sampling-variance estimate further but roughly doubles compute again per
+# increment; 2 was chosen as the minimum defensible fix given the existing
+# compute-budget constraint, not as a power-justified target). See
+# reviews/review-01.md (W2) -- this is a real design gap, not an optional
+# robustness check.
+n_samples_per_cell: 2

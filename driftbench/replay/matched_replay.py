@@ -27,13 +27,14 @@ class TaskInstance(Protocol):
     instance_id: str
 
 
-EpisodeRunner = Callable[[TaskInstance, ConditionSpec, NoisyMemoryStore], SeqMemTrace]
+EpisodeRunner = Callable[[TaskInstance, ConditionSpec, NoisyMemoryStore, int], SeqMemTrace]
 
 
 @dataclass
 class ReplayResult:
     condition_name: str
     instance_id: str
+    replicate: int
     trace: SeqMemTrace
 
 
@@ -43,13 +44,27 @@ def run_matched_replay(
     episode_runner: EpisodeRunner,
     dim: int,
     include_selection: bool = True,
+    n_samples_per_cell: int = 1,
 ) -> list[ReplayResult]:
     """For every task instance, replay it once per grid condition (9 factorial
     cells, plus Selection's one-at-a-time conditions if `include_selection`).
     Each (instance, condition) pair gets a freshly constructed NoisyMemoryStore
     — trajectories are expected to diverge after the first retrieval; only the
     starting instance is held fixed, per the matched-replay design.
+
+    `n_samples_per_cell` controls how many independent replicates are run per
+    (instance, condition) pair. Default 1 preserves prior behavior. Setting
+    this above 1 is what makes sampling variance (the generation model's own
+    stochastic decoding) separately identifiable from between-instance
+    heterogeneity in the mixed-effects analysis: with exactly one replicate
+    per cell there is only one observation to estimate both quantities from,
+    so they cannot be told apart. `episode_runner` receives the 0-indexed
+    replicate number as its last argument so callers can, e.g., vary a
+    generation seed deterministically per replicate.
     """
+    if n_samples_per_cell < 1:
+        raise ValueError("n_samples_per_cell must be >= 1")
+
     results: list[ReplayResult] = []
     conditions = list(grid.factorial_cells)
     if include_selection:
@@ -57,18 +72,20 @@ def run_matched_replay(
 
     for instance in instances:
         for condition in conditions:
-            store = NoisyMemoryStore(
-                dim=dim,
-                stochastic=condition.stochastic,
-                systematic=condition.systematic,
-                selection=condition.selection,
-            )
-            trace = episode_runner(instance, condition, store)
-            results.append(
-                ReplayResult(
-                    condition_name=condition.name,
-                    instance_id=instance.instance_id,
-                    trace=trace,
+            for replicate in range(n_samples_per_cell):
+                store = NoisyMemoryStore(
+                    dim=dim,
+                    stochastic=condition.stochastic,
+                    systematic=condition.systematic,
+                    selection=condition.selection,
                 )
-            )
+                trace = episode_runner(instance, condition, store, replicate)
+                results.append(
+                    ReplayResult(
+                        condition_name=condition.name,
+                        instance_id=instance.instance_id,
+                        replicate=replicate,
+                        trace=trace,
+                    )
+                )
     return results
