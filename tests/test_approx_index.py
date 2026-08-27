@@ -47,3 +47,10 @@ def test_search_returns_k_ids():
     results = index.search(vecs[0], k=5)
     assert len(results) == 5
     assert 0 in results  # nearest neighbor of itself
+
+
+def test_empty_index_search_is_safe():
+    index = ApproxIndex(8, ApproxIndexConfig(kind="flat"))
+    query = np.ones(8, dtype=np.float32)
+    assert index.search(query, k=3) == []
+    assert index.recall_at_k(query, k=3) == 1.0

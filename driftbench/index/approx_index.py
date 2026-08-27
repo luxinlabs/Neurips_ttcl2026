@@ -67,6 +67,11 @@ class ApproxIndex:
 
     def search(self, query: np.ndarray, k: int) -> list[int]:
         """Return the k nearest item ids under the approximate index."""
+        if not self._ids:
+            # Nothing persisted yet (e.g. step 0, or a stale index whose writes
+            # are all still pending). An untrained IVF index would raise here,
+            # so short-circuit to an empty result.
+            return []
         query = np.ascontiguousarray(query.reshape(1, -1), dtype=np.float32)
         _, idx = self._approx.search(query, k)
         return [self._ids[i] for i in idx[0] if i != -1]
@@ -78,6 +83,8 @@ class ApproxIndex:
         more aggressive.
         """
         query = np.ascontiguousarray(query.reshape(1, -1), dtype=np.float32)
+        if not self._ids:
+            return 1.0  # nothing persisted yet: no approximation error to report
         _, exact_idx = self._exact.search(query, k)
         _, approx_idx = self._approx.search(query, k)
         exact_set = {i for i in exact_idx[0] if i != -1}

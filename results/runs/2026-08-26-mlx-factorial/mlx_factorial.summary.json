@@ -1,0 +1,138 @@
+{
+  "meta": {
+    "started_at": "2026-08-26T06:44:43.101440+00:00",
+    "elapsed_sec": 3089.6883018016815,
+    "backend": "mlx",
+    "llm": {
+      "backend": "mlx",
+      "model": "mlx-community/Meta-Llama-3.1-8B-Instruct-4bit",
+      "device": "Device(gpu, 0)",
+      "max_tokens": 96,
+      "temperature": 0.7,
+      "system_prompt": true
+    },
+    "embedder": {
+      "backend": "bge",
+      "model": "BAAI/bge-base-en-v1.5",
+      "device": "mps",
+      "dim": 768
+    },
+    "n_instances": 8,
+    "n_steps": 16,
+    "n_samples": 2,
+    "include_selection": false,
+    "grid": "/Users/austin/repos/Neurips_ttcl2026/configs/grid_default.yaml",
+    "n_rollouts": 144,
+    "smoke": false
+  },
+  "rows": [
+    {
+      "condition": "stochastic=aggressive,systematic=fresh",
+      "n": 16,
+      "proxy_success_mean": 0.63671875,
+      "proxy_success_se": 0.025012204052472065,
+      "recall_mean": 1.0,
+      "recall_se": 0.0,
+      "drift_kl_mean": 0.4631444246609888,
+      "drift_kl_se": 0.039672588031317325,
+      "staleness_mean": 0.0,
+      "recall_at_k_mean": 1.0
+    },
+    {
+      "condition": "stochastic=aggressive,systematic=moderate",
+      "n": 16,
+      "proxy_success_mean": 0.6953125,
+      "proxy_success_se": 0.022004823098205843,
+      "recall_mean": 1.0,
+      "recall_se": 0.0,
+      "drift_kl_mean": 0.37104802137896764,
+      "drift_kl_se": 0.03210147204630205,
+      "staleness_mean": 5.0,
+      "recall_at_k_mean": 1.0
+    },
+    {
+      "condition": "stochastic=aggressive,systematic=stale",
+      "n": 16,
+      "proxy_success_mean": 0.578125,
+      "proxy_success_se": 0.006987712429686843,
+      "recall_mean": 1.0,
+      "recall_se": 0.0,
+      "drift_kl_mean": 0.549024015988372,
+      "drift_kl_se": 0.011779663757746655,
+      "staleness_mean": 15.0,
+      "recall_at_k_mean": 1.0
+    },
+    {
+      "condition": "stochastic=exact,systematic=fresh",
+      "n": 16,
+      "proxy_success_mean": 0.63671875,
+      "proxy_success_se": 0.026893616371966415,
+      "recall_mean": 0.9375,
+      "recall_se": 0.0625,
+      "drift_kl_mean": 0.4645341835014151,
+      "drift_kl_se": 0.041631324534582424,
+      "staleness_mean": 0.0,
+      "recall_at_k_mean": 1.0
+    },
+    {
+      "condition": "stochastic=exact,systematic=moderate",
+      "n": 16,
+      "proxy_success_mean": 0.67578125,
+      "proxy_success_se": 0.019943564581818535,
+      "recall_mean": 1.0,
+      "recall_se": 0.0,
+      "drift_kl_mean": 0.3987074183490256,
+      "drift_kl_se": 0.030483130556980063,
+      "staleness_mean": 5.0,
+      "recall_at_k_mean": 1.0
+    },
+    {
+      "condition": "stochastic=exact,systematic=stale",
+      "n": 16,
+      "proxy_success_mean": 0.57421875,
+      "proxy_success_se": 0.006298638865858242,
+      "recall_mean": 1.0,
+      "recall_se": 0.0,
+      "drift_kl_mean": 0.5556090482169751,
+      "drift_kl_se": 0.010618045421570094,
+      "staleness_mean": 15.0,
+      "recall_at_k_mean": 1.0
+    },
+    {
+      "condition": "stochastic=moderate,systematic=fresh",
+      "n": 16,
+      "proxy_success_mean": 0.6484375,
+      "proxy_success_se": 0.018814991529362963,
+      "recall_mean": 1.0,
+      "recall_se": 0.0,
+      "drift_kl_mean": 0.4397354748004353,
+      "drift_kl_se": 0.029831511763472738,
+      "staleness_mean": 0.0,
+      "recall_at_k_mean": 1.0
+    },
+    {
+      "condition": "stochastic=moderate,systematic=moderate",
+      "n": 16,
+      "proxy_success_mean": 0.6796875,
+      "proxy_success_se": 0.017929077581310942,
+      "recall_mean": 1.0,
+      "recall_se": 0.0,
+      "drift_kl_mean": 0.3916037109445057,
+      "drift_kl_se": 0.02737279763193886,
+      "staleness_mean": 5.0,
+      "recall_at_k_mean": 1.0
+    },
+    {
+      "condition": "stochastic=moderate,systematic=stale",
+      "n": 16,
+      "proxy_success_mean": 0.578125,
+      "proxy_success_se": 0.013380450602776175,
+      "recall_mean": 0.9375,
+      "recall_se": 0.0625,
+      "drift_kl_mean": 0.5515753906458797,
+      "drift_kl_se": 0.021387400647737437,
+      "staleness_mean": 15.0,
+      "recall_at_k_mean": 1.0
+    }
+  ]
+}

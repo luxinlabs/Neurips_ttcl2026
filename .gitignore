@@ -3,5 +3,7 @@ __pycache__/
 .pytest_cache/
 .claude/
 .venv/
-results/
+results/*
+!results/runs/
+!results/runs/**
 paper/paper_PREVIEW_not_final.pdf
