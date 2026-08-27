@@ -3,7 +3,7 @@ from driftbench.agent.fakes import FakeEmbedder, FakeLLM
 from driftbench.index.approx_index import ApproxIndexConfig
 from driftbench.index.noisy_memory import NoisyMemoryStore
 from driftbench.index.shadow_index import ShadowIndexConfig
-from testbeds.synthetic_world import MemoryGatedPolicy, SyntheticWorldAdapter
+from testbeds.synthetic_world import MemoryGatedPolicy, SyntheticWorldAdapter, lore_notes
 
 
 def _fresh_memory(dim: int) -> NoisyMemoryStore:
@@ -12,6 +12,15 @@ def _fresh_memory(dim: int) -> NoisyMemoryStore:
         stochastic=ApproxIndexConfig(kind="flat"),
         systematic=ShadowIndexConfig(rebuild_cadence=1),
     )
+
+
+def test_lore_notes_are_deterministic_and_instance_specific():
+    a = lore_notes("synth-000", 5)
+    b = lore_notes("synth-000", 5)
+    c = lore_notes("synth-001", 5)
+    assert a == b
+    assert a != c
+    assert len(a) == 5
 
 
 def test_reset_is_deterministic_per_instance():

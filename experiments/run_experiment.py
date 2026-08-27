@@ -25,7 +25,7 @@ from driftbench.config import ConditionSpec, ExperimentGrid, build_grid
 from driftbench.eval.seqmem_protocol import SeqMemTrace
 from driftbench.index.noisy_memory import NoisyMemoryStore
 from driftbench.replay.matched_replay import ReplayResult, run_matched_replay
-from testbeds.synthetic_world import MemoryGatedPolicy, SyntheticWorldAdapter
+from testbeds.synthetic_world import MemoryGatedPolicy, SyntheticWorldAdapter, lore_notes
 
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_GRID = ROOT / "configs" / "grid_default.yaml"
@@ -191,6 +191,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p.add_argument("--max-tokens", type=int, default=96)
     p.add_argument("--temperature", type=float, default=0.7)
     p.add_argument("--k-retrieve", type=int, default=4)
+    p.add_argument(
+        "--seed-notes",
+        type=int,
+        default=0,
+        help="pre-fill memory with this many instance-matched lore notes so ANN can miss",
+    )
     return p.parse_args(argv)
 
 
@@ -226,7 +232,8 @@ def main(argv: list[str] | None = None) -> int:
         f"{' + ' + str(len(grid.selection_conditions)) + ' selection' if include_selection else ''}"
         f" | {n_instances} instances x {n_samples} replicates = {n_rollouts} rollouts"
         f"{f' + {n_oracle} oracle' if n_oracle else ''}"
-        f" x {n_steps} steps",
+        f" x {n_steps} steps"
+        f"{f' | seed_notes={args.seed_notes}' if args.seed_notes else ''}",
         flush=True,
     )
 
@@ -248,6 +255,9 @@ def main(argv: list[str] | None = None) -> int:
         if hasattr(llm, "set_seed"):
             llm.set_seed(seed)
         adapter = SyntheticWorldAdapter(n_steps=n_steps)
+        if args.seed_notes:
+            for note in lore_notes(instance.instance_id, args.seed_notes):
+                store.write(embedder.embed_one(note), payload=note)
         t0 = time.time()
         trace = run_self_feedback_episode(
             instance_id=instance.instance_id,
@@ -300,6 +310,7 @@ def main(argv: list[str] | None = None) -> int:
         "grid": str(args.grid),
         "n_rollouts": n_rollouts,
         "smoke": args.smoke,
+        "seed_notes": args.seed_notes,
     }
     _write_jsonl(args.out, results, meta)
     summary_path = args.out.with_suffix(".summary.json")

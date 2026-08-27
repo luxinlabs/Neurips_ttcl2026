@@ -39,6 +39,24 @@ def _rng_seed(instance_id: str) -> int:
     return int(hashlib.sha256(instance_id.encode()).hexdigest()[:8], 16)
 
 
+def lore_notes(instance_id: str, n: int) -> list[str]:
+    """Deterministic distractor notes used to pre-fill memory.
+
+    The v1 factorial left recall@k at 1.0 because HNSW over ~16 episode
+    writes is effectively exact. Seeding a larger lore set is what lets the
+    stochastic channel actually miss neighbours, without changing the matched
+    starting instance.
+    """
+    if n < 0:
+        raise ValueError("n must be >= 0")
+    seed = _rng_seed(instance_id)
+    notes = []
+    for i in range(n):
+        who, what = DISTRACTORS[(seed + i) % len(DISTRACTORS)]
+        notes.append(f"City lore {i}: {who} {what} (record {i}).")
+    return notes
+
+
 @dataclass
 class SyntheticWorldAdapter:
     """N-step world with one revising fact plus stable distractors.
