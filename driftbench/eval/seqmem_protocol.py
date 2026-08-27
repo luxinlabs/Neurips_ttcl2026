@@ -20,6 +20,10 @@ class Checkpoint:
     proxy_success: float  # e.g. downstream task success rate, in [0, 1]
     recall_score: float  # free-form recall accuracy w/ context removed, in [0, 1]
     forgetting: float = 0.0  # drop in recall_score on earlier-episode facts, in [0, 1]
+    drift_kl: float = 0.0  # KL from episode-0 success distribution (RDumb++)
+    staleness: int = 0  # systematic channel dose at this retrieval
+    recall_at_k: float = 1.0  # stochastic channel dose at this retrieval
+    retention_rate: float | None = None  # selection channel, if measured
 
 
 @dataclass

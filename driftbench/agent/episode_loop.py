@@ -47,6 +47,12 @@ def run_self_feedback_episode(
 
     observation = adapter.reset(instance_id)
     successes: list[bool] = []
+    # Closed-book recall still needs the episode transcript (observations /
+    # actions / results) but must not include retrieved memory notes — that's
+    # SeqMem-Eval's "supporting context removed" condition. Stateless
+    # generate() calls have no hidden conversation state, so we pass the
+    # transcript explicitly.
+    transcript: list[str] = [f"Observation: {observation}"]
 
     for step in range(n_steps):
         query_vec = embedder.embed_one(observation)
@@ -55,6 +61,8 @@ def run_self_feedback_episode(
         action = llm.generate(_act_prompt(observation, report.retrieved_payloads))
         result = adapter.step(action)
         successes.append(result.success)
+        transcript.append(f"Action: {action}")
+        transcript.append(f"Result: {result.observation}")
 
         feedback = llm.generate(_reflect_prompt(observation, action, result.observation))
         feedback_vec = embedder.embed_one(feedback)
@@ -65,10 +73,23 @@ def run_self_feedback_episode(
         if step % checkpoint_every == 0:
             proxy_success = sum(successes) / len(successes)
             probe_q, probe_gt = adapter.recall_probe()
-            recall_response = llm.generate(f"Without looking anything up, answer: {probe_q}")
+            history = "\n".join(transcript)
+            recall_response = llm.generate(
+                f"Episode so far:\n{history}\n\nWithout retrieving from memory, answer: {probe_q}"
+            )
             recall_score = 1.0 if probe_gt.strip().lower() in recall_response.strip().lower() else 0.0
-            trace.add(Checkpoint(episode=step, proxy_success=proxy_success, recall_score=recall_score))
             drift.record(step, np.array([proxy_success, 1 - proxy_success]))
+            trace.add(
+                Checkpoint(
+                    episode=step,
+                    proxy_success=proxy_success,
+                    recall_score=recall_score,
+                    drift_kl=0.0 if step == 0 else drift.drift_at(step),
+                    staleness=report.staleness,
+                    recall_at_k=report.recall_at_k,
+                    retention_rate=report.retention_rate,
+                )
+            )
 
         if result.done:
             break

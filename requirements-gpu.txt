@@ -1,0 +1,7 @@
+# GPU extras for Apple Silicon (MLX Metal + PyTorch MPS). Core harness deps
+# stay in requirements.txt / environment.yml.
+mlx
+mlx-lm
+torch
+sentence-transformers
+huggingface_hub

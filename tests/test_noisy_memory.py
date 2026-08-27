@@ -67,3 +67,25 @@ def test_flush_makes_pending_writes_searchable():
 
     store.flush()
     assert store.retrieve(vec, k=1).retrieved_ids == [0]
+
+
+def test_retrieval_routes_through_the_approximate_index():
+    """Regression guard for the stochastic channel being on the retrieval path.
+
+    Under an approximate (HNSW) index, the retrieved ids must be exactly what
+    the approximate index returns (budget unbounded here). On the previous
+    implementation retrieval came from an exact shadow index, so the stochastic
+    level could not affect what was retrieved; that version fails this test.
+    """
+    dim = 8
+    store = NoisyMemoryStore(
+        dim=dim,
+        stochastic=ApproxIndexConfig(kind="hnsw", hnsw_m=8, ef_search=8),
+        systematic=ShadowIndexConfig(rebuild_cadence=1),
+    )
+    rng = np.random.default_rng(0)
+    for _ in range(20):
+        store.write(rng.standard_normal(dim).astype(np.float32))
+    q = rng.standard_normal(dim).astype(np.float32)
+    report = store.retrieve(q, k=3)
+    assert report.retrieved_ids == store._approx.search(q, k=3)[:3]

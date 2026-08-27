@@ -12,3 +12,10 @@ dependencies:
   - pyyaml
   - pytest
   - faiss-cpu
+  - pip
+  - pip:
+      - mlx
+      - mlx-lm
+      - torch
+      - sentence-transformers
+      - huggingface_hub
